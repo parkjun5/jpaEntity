@@ -1,14 +1,15 @@
 package jpaTest.main;
 
 import jpaTest.domain.Game;
-import jpaTest.domain.OrderItem;
-import jpaTest.domain.Orders;
 import jpaTest.domain.Steam;
+import jpaTest.domain.SuperMapped.Users;
+import jpaTest.domain.item.Movie;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDateTime;
 
 public class jpaMain {
 
@@ -20,9 +21,17 @@ public class jpaMain {
         tx.begin();
         try {
 //            steamExample(em);
-            Orders orders = new Orders();
-            orders.addOrderItem(new OrderItem());
+//            Orders orders = new Orders();
+//            orders.addOrderItem(new OrderItem());
 
+            itemSuperMovieTest(em);
+
+//            Users user = new Users();
+//            user.setName("USER!");
+//            user.setCreateBy("park");
+//            user.setCreateDate(LocalDateTime.now());
+
+//            em.persist(user);
 
             tx.commit();
 
@@ -34,6 +43,31 @@ public class jpaMain {
         }
 
         emf.close();
+    }
+
+    private static void itemSuperMovieTest(EntityManager em) {
+        Movie movie = new Movie();
+        movie.setName("movie");
+        movie.setPrice(15000);
+        movie.setActor("ACTOR A");
+        movie.setDirector("DIRECTOR D");
+        movie.setCreateBy("park");
+        movie.setCreateDate(LocalDateTime.now());
+        System.out.println("=======BEFORE PERSIST========");
+        System.out.println("movie.getId() = " + movie.getId());
+        System.out.println("============================");
+
+        em.persist(movie);
+        System.out.println("=======AFTER PERSIST========");
+        System.out.println("movie.getId() = " + movie.getId());
+
+        System.out.println("============================");
+
+        em.flush();
+        em.clear();
+
+        Movie findMovie = em.find(Movie.class, movie.getId());
+        System.out.println("findMovie = " + findMovie);
     }
 
     private static void steamExample(EntityManager em) {
