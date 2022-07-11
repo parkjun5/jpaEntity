@@ -3,6 +3,8 @@ package jpaTest.domain;
 
 import javax.persistence.*;
 
+import static javax.persistence.FetchType.*;
+
 @Entity
 public class Delivery {
 
@@ -16,7 +18,7 @@ public class Delivery {
     @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 
-    @OneToOne(mappedBy = "delivery")
+    @OneToOne(mappedBy = "delivery", fetch = LAZY)
     private Orders orders;
 
 }
