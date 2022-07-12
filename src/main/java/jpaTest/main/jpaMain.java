@@ -2,6 +2,9 @@ package jpaTest.main;
 
 import jpaTest.domain.*;
 import jpaTest.domain.SuperMapped.Users;
+import jpaTest.domain.collection.Address;
+import jpaTest.domain.collection.AddressEntity;
+import jpaTest.domain.collection.Youtuber;
 import jpaTest.domain.item.Movie;
 
 import javax.persistence.EntityManager;
@@ -34,27 +37,82 @@ public class jpaMain {
 //            em.persist(user);
 
 
-            catAndHomeTEst(em);
+//            catAndHomeTEst(em);
 //            lazyAndEagerDiff(em);
-            Child child1 = new Child();
-            Child child2 = new Child();
-            Child child3 = new Child();
+//            casacadeTest(em);
+            Youtuber youtuber = new Youtuber();
+            youtuber.setName("유튜바");
+            youtuber.setHomeAddress(new Address("서울", "길", "11-11"));
 
-            Parent parent = new Parent();
-            parent.setName("parent");
+            youtuber.getFavoriteFoods().add("햄버거");
+            youtuber.getFavoriteFoods().add("피자");
+            youtuber.getFavoriteFoods().add("수제 햄버거");
 
-            parent.addChild(child1);
-            parent.addChild(child2);
-            parent.addChild(child3);
+            System.out.println("youtuber.getFavoriteFoods() = " + youtuber.getFavoriteFoods());
+            AddressEntity addressEntity = new AddressEntity();
+            addressEntity.setAddress(new Address("오래된", "길", "11-11"));
+            youtuber.getAddressHistory().add(addressEntity);
 
-            em.persist(parent);
+            AddressEntity addressEntity2 = new AddressEntity();
+            addressEntity2.setAddress(new Address("옛날", "길", "11-11"));
+            youtuber.getAddressHistory().add(addressEntity2);
+
+            AddressEntity addressEntity4 = new AddressEntity();
+            addressEntity4.setAddress(new Address("삭제해야할", "길", "11-11"));
+            youtuber.getAddressHistory().add(addressEntity4);
+
+
+            em.persist(youtuber);
+
             em.flush();
             em.clear();
-            Parent findParent = em.find(Parent.class, parent.getId());
 
-            findParent.getChildList().remove(1);
+            Youtuber findYoutuber = em.find(Youtuber.class, youtuber.getId());
+            /**
+             * 검색 
+             */
+//            System.out.println("===============================");
+//            System.out.println("findYoutuber = " + findYoutuber);
+//            System.out.println("===============================");
+//            System.out.println("getFavoriteFoods = " + findYoutuber.getFavoriteFoods().getClass());
+//            System.out.println("===============================");
+//            System.out.println("getAddressHistory = " + findYoutuber.getAddressHistory().getClass());
+//            System.out.println("===============================");
 
+            /**
+             * 수정 주소
+             */
 
+            Address oldAddress = findYoutuber.getHomeAddress();
+            AddressEntity addressEntity3 = new AddressEntity();
+//            AddressEntity removeEntity = new AddressEntity();
+//            removeEntity.setAddress(new Address("삭제해야할", "길", "11-11"));
+//            List<AddressEntity> addressHistory = findYoutuber.getAddressHistory();
+//            for (AddressEntity entity : addressHistory) {
+//                System.out.println("entity.getAddress().getCity() = " + entity.getAddress().getCity());
+//
+//                boolean isEqaul = entity.equals(removeEntity);
+//                System.out.println("isEqaul = " + isEqaul);
+//                if ( isEqaul ){
+//                    System.out.println("entity = " + entity.getAddress().getCity());
+//                }
+//            }
+            AddressEntity removeEntity = new AddressEntity();
+            removeEntity.setAddress(new Address("삭제해야할", "길", "11-11"));
+            System.out.println("==========삭제처리 ---------------");
+            findYoutuber.getAddressHistory().remove(removeEntity);
+            System.out.println("==========현 주소 히스토리 추가 ---------------");
+            findYoutuber.getAddressHistory().add(addressEntity3.setAddress(oldAddress));
+            System.out.println("==========주소 업데이트 ---------------");
+            findYoutuber.setHomeAddress(new Address("새로운 시작" ,oldAddress.getStreet(), oldAddress.getZipcode()));
+
+            /**
+             * 수정 음식
+             */
+//
+//            findYoutuber.getFavoriteFoods().remove("햄버거");
+//            findYoutuber.getFavoriteFoods().add("버거킹");
+            
             tx.commit();
 
         } catch (Exception e) {
@@ -65,6 +123,26 @@ public class jpaMain {
         }
 
         emf.close();
+    }
+
+    private static void casacadeTest(EntityManager em) {
+        Child child1 = new Child();
+        Child child2 = new Child();
+        Child child3 = new Child();
+
+        Parent parent = new Parent();
+        parent.setName("parent");
+
+        parent.addChild(child1);
+        parent.addChild(child2);
+        parent.addChild(child3);
+
+        em.persist(parent);
+        em.flush();
+        em.clear();
+        Parent findParent = em.find(Parent.class, parent.getId());
+
+        findParent.getChildList().remove(1);
     }
 
     private static void lazyAndEagerDiff(EntityManager em) {
